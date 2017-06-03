@@ -5,6 +5,7 @@ import android.util.Log;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -26,8 +27,15 @@ public class SamplePeriodicService extends BasePeriodicService
 
     @Override
     protected long getIntervalMS() {
-        
-        return 1000 * 30;
+        //10時から9時までは5分おきその他は一時間
+        Calendar calendar = Calendar.getInstance();
+        int hh = calendar.get(Calendar.HOUR_OF_DAY);
+        int mm = calendar.get(Calendar.MINUTE);
+        Log.d(TAG,"Hour "+String.valueOf(hh)+" Min "+String.valueOf(mm));
+        if ((hh > 21) || (hh < 10)) {
+            return 1000 * 3600;
+        }
+        return 1000 * 300;
     }
 
 
