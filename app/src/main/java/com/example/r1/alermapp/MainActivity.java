@@ -21,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        if (SamplePeriodicService.isServiceRunning()) {
+            findViewById(R.id.button4).setEnabled(false);
+        }
         findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -33,9 +33,9 @@ public class SamplePeriodicService extends BasePeriodicService
         int mm = calendar.get(Calendar.MINUTE);
         Log.d(TAG,"Hour "+String.valueOf(hh)+" Min "+String.valueOf(mm));
         if ((hh > 21) || (hh < 10)) {
-            return 1000 * 3600;
+            return 1000 * 1800;
         }
-        return 1000 * 300;
+        return 1000 * 120;
     }
 
 
@@ -48,20 +48,28 @@ public class SamplePeriodicService extends BasePeriodicService
         // ここから下を別スレッドで実行する。
         OkHttpClient client = OkHttpSingleton.getInstance().getOkHttpClient();
 
-        Request request = new Request.Builder()
-                .url("http://192.168.1.231/index.html")
+        final Request request = new Request.Builder()
+                .url("http://192.168.1.231/check.html")
                 .build();
 
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                //失敗しても特に何もしない。
                 Log.d(TAG,"fail");
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Log.d(TAG,"Success");
+                if (response.isSuccessful()) {
+                    Log.d(TAG,"Success");
+                    if (response.body().string().contains("NG")) {
+                        //応答にNGがあった場合なにかする。
+                        Log.d(TAG,"NG Detect");
+                    }
+                }
+
             }
         });
 
@@ -90,4 +98,16 @@ public class SamplePeriodicService extends BasePeriodicService
         }
     }
 
+    public static boolean isServiceRunning() {
+        if (activeService != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG,"service destroy");
+        super.onDestroy();
+    }
 }
