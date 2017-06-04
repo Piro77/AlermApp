@@ -1,5 +1,13 @@
 package com.example.r1.alermapp;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -67,6 +75,7 @@ public class SamplePeriodicService extends BasePeriodicService
                     if (response.body().string().contains("NG")) {
                         //応答にNGがあった場合なにかする。
                         Log.d(TAG,"NG Detect");
+                        setNotification();
                     }
                 }
 
@@ -109,5 +118,27 @@ public class SamplePeriodicService extends BasePeriodicService
     public void onDestroy() {
         Log.d(TAG,"service destroy");
         super.onDestroy();
+    }
+
+    private void setNotification() {
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+        Notification notif= new Notification.Builder(this)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText("テスト通知")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                //.setContentIntent(contentIntent)
+                .setDefaults(Notification.DEFAULT_SOUND
+                        | Notification.DEFAULT_VIBRATE
+                        | Notification.DEFAULT_LIGHTS)
+                .setAutoCancel(true)
+                .build();
+
+
+        NotificationManager nm;
+        nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(1, notif);
     }
 }
