@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -72,10 +74,23 @@ public class SamplePeriodicService extends BasePeriodicService
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     Log.d(TAG,"Success");
-                    if (response.body().string().contains("NG")) {
+                    String body = response.body().string();
+                    if (body.contains("NG")) {
                         //応答にNGがあった場合なにかする。
                         Log.d(TAG,"NG Detect");
                         setNotification();
+                    }
+                    if (body.contains("ALARM")) {
+                        Log.d(TAG,"ALARM START");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent i = new Intent(getApplicationContext(),AlarmActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(i);
+                            }
+                        });
+
                     }
                 }
 
@@ -140,5 +155,8 @@ public class SamplePeriodicService extends BasePeriodicService
         NotificationManager nm;
         nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         nm.notify(1, notif);
+    }
+    private void runOnUiThread(Runnable task) {
+        new Handler(Looper.getMainLooper()).post(task);
     }
 }
