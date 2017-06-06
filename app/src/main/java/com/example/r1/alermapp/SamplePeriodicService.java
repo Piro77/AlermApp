@@ -85,9 +85,18 @@ public class SamplePeriodicService extends BasePeriodicService
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                /*
                                 Intent i = new Intent(getApplicationContext(),AlarmActivity.class);
                                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(i);
+                                */
+                                Intent intent = new Intent(getApplicationContext(), AlarmActivity.class);
+                                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0, intent, 0);
+                                try {
+                                    pendingIntent.send();
+                                } catch (Throwable e){
+                                    Log.d(TAG,e.getMessage());
+                                }
                             }
                         });
 

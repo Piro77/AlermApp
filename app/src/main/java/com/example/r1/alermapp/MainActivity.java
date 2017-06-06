@@ -24,6 +24,10 @@ public class MainActivity extends AppCompatActivity {
         if (SamplePeriodicService.isServiceRunning()) {
             findViewById(R.id.button4).setEnabled(false);
         }
+        else {
+            new SamplePeriodicService().startResident(getApplicationContext());
+            findViewById(R.id.button4).setEnabled(false);
+        }
         findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 showToast("btn1");
                 Log.d(TAG,"click1");
                 new SamplePeriodicService().startResident(getApplicationContext());
+                v.setEnabled(false);
 
             }
         });

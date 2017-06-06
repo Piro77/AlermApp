@@ -27,6 +27,13 @@ public class AlarmActivity extends AppCompatActivity {
     Ringtone ringtone;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
 
@@ -35,7 +42,6 @@ public class AlarmActivity extends AppCompatActivity {
         findViewById(R.id.gotohome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 ringtone.stop();
                 //ホーム画面に戻るインテントを起動
                 Intent homeIntent = new Intent(Intent.ACTION_MAIN);
@@ -58,13 +64,16 @@ public class AlarmActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        getWindow().addFlags(FLAG_DISMISS_KEYGUARD);
+
         super.onResume();
     }
 
     @Override
     protected void onStop() {
-        getWindow().clearFlags(FLAG_DISMISS_KEYGUARD);
         super.onStop();
+    }
+    @Override
+    public void onAttachedToWindow() {
+
     }
 }

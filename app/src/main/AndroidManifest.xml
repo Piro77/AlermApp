@@ -31,7 +31,9 @@
         <!-- サンプルのサービス -->
         <service android:name=".SamplePeriodicService" />
 
-        <activity android:name=".AlarmActivity"></activity>
+        <activity android:name=".AlarmActivity"
+            android:showOnLockScreen="true"
+            ></activity>
     </application>
 
 </manifest>
