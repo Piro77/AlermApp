@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
@@ -103,13 +104,15 @@ public abstract class BasePeriodicService extends Service
                 0
         );
         AlarmManager am = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        am.set(
-                AlarmManager.RTC,
-                now + getIntervalMS(),
-                alarmSender
-        );
-        // 次回登録が完了
 
+        // 次回登録が完了
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            am.setAlarmClock(new AlarmManager.AlarmClockInfo(now+getIntervalMS(), null), alarmSender);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            am.setExact(AlarmManager.RTC_WAKEUP, now+getIntervalMS(), alarmSender);
+        } else {
+            am.set(AlarmManager.RTC_WAKEUP, now+getIntervalMS(), alarmSender);
+        }
     }
 
 

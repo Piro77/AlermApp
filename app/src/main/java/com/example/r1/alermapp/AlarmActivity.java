@@ -6,6 +6,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.PowerManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ public class AlarmActivity extends AppCompatActivity {
     private final int FLAG_DISMISS_KEYGUARD =
             WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                     WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                     WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
 
     Ringtone ringtone;
@@ -34,6 +36,7 @@ public class AlarmActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                ringtone.stop();
                 //ホーム画面に戻るインテントを起動
                 Intent homeIntent = new Intent(Intent.ACTION_MAIN);
                 homeIntent.addCategory(Intent.CATEGORY_HOME);
@@ -42,12 +45,7 @@ public class AlarmActivity extends AppCompatActivity {
                 finish();
             }
         });
-        findViewById(R.id.stopalarm).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ringtone.stop();
-            }
-        });
+
 
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);     // 着信音
         ringtone = RingtoneManager.getRingtone(this, uri);
@@ -55,6 +53,8 @@ public class AlarmActivity extends AppCompatActivity {
         ringtone.play(); // 再生
 
     }
+
+
 
     @Override
     protected void onResume() {

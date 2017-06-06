@@ -8,26 +8,18 @@
     tools:context="com.example.r1.alermapp.AlarmActivity">
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <Button
-        android:id="@+id/stopalarm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="アラーム停止" />
-
-    <TextView
         android:id="@+id/textView4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_weight="1"
+        android:textSize="32sp"
+        android:text="異常がありました。アプリを確認してください。" />
 
     <Button
         android:id="@+id/gotohome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ホームへ戻る" />
+        android:layout_weight="1"
+        android:text="確認"
+        android:textSize="32sp" />
 </LinearLayout>
