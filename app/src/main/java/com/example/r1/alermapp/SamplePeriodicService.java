@@ -42,7 +42,7 @@ public class SamplePeriodicService extends BasePeriodicService
         int hh = calendar.get(Calendar.HOUR_OF_DAY);
         int mm = calendar.get(Calendar.MINUTE);
         Log.d(TAG,"Hour "+String.valueOf(hh)+" Min "+String.valueOf(mm));
-        if ((hh > 21) || (hh < 10)) {
+        if ((hh > 21) || (hh < 9)) {
             return 1000 * 1800;
         }
         return 1000 * 120;
@@ -59,7 +59,7 @@ public class SamplePeriodicService extends BasePeriodicService
         OkHttpClient client = OkHttpSingleton.getInstance().getOkHttpClient();
 
         final Request request = new Request.Builder()
-                .url("http://192.168.1.231/check.html")
+                .url("http://192.168.1.23/check.html")
                 .build();
 
         Call call = client.newCall(request);
@@ -67,7 +67,7 @@ public class SamplePeriodicService extends BasePeriodicService
             @Override
             public void onFailure(Call call, IOException e) {
                 //失敗しても特に何もしない。
-                Log.d(TAG,"fail");
+                Log.d(TAG,"fail "+e.getMessage());
             }
 
             @Override
@@ -107,7 +107,7 @@ public class SamplePeriodicService extends BasePeriodicService
         });
 
         // ログ出力（ここに定期実行したい処理を書く）
-       Log.d(TAG, "fuga");
+//       Log.d(TAG, "fuga");
 
         // 次回の実行について計画を立てる
         makeNextPlan();
