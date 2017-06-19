@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
+import android.support.annotation.IntDef;
 
 /**
  * 常駐型サービスの基底クラス。
@@ -71,21 +72,11 @@ public abstract class BasePeriodicService extends Service
         return this;
     }
 
-
     @Override
-    public void onStart(Intent intent, int startId) {
-
-        // サービス起動時の処理。
-        // サービス起動中に呼ぶと複数回コールされ得る。しかし二重起動はしない
-        // @see http://d.hatena.ne.jp/rso/20110911
-
-        super.onStart(intent, startId);
-
-        // タスクを実行
+    public int onStartCommand(Intent intent, int flags, int startId) {
+         super.onStartCommand(intent, flags, startId);
         execTask();
-
-        // NOTE: ここで次回の実行計画を逐次的にコールしていない理由は，
-        // タスクが非同期の場合があるから。
+        return START_STICKY;
     }
 
 
