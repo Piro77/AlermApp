@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Calendar;
 
+import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -60,6 +61,7 @@ public class SamplePeriodicService extends BasePeriodicService
 
         final Request request = new Request.Builder()
                 .url("http://192.168.1.23/check.html")
+                .cacheControl(new CacheControl.Builder().noCache().build())
                 .build();
 
         Call call = client.newCall(request);
