@@ -77,6 +77,7 @@ public class SamplePeriodicService extends BasePeriodicService
                 if (response.isSuccessful()) {
                     Log.d(TAG,"Success");
                     String body = response.body().string();
+                    response.close();
                     if (body.contains("NG")) {
                         //応答にNGがあった場合なにかする。
                         Log.d(TAG,"NG Detect");
