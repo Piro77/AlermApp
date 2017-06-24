@@ -28,7 +28,6 @@ public class OkHttpSingleton {
         okHttpBuilder.connectTimeout(20, TimeUnit.SECONDS);
         okHttpBuilder.readTimeout(15, TimeUnit.SECONDS);
         okHttpBuilder.writeTimeout(15, TimeUnit.SECONDS);
-        okHttpBuilder.addInterceptor(getInterceptor());
 
         mOkHttpClient = okHttpBuilder.build();
     }
@@ -50,5 +49,15 @@ public class OkHttpSingleton {
 
     public OkHttpClient getOkHttpClient() {
         return mOkHttpClient;
+    }
+
+    public void rebuildOkHttpClient() {
+
+        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
+        okHttpBuilder.connectTimeout(20, TimeUnit.SECONDS);
+        okHttpBuilder.readTimeout(15, TimeUnit.SECONDS);
+        okHttpBuilder.writeTimeout(15, TimeUnit.SECONDS);
+
+        mOkHttpClient = okHttpBuilder.build();
     }
 }
