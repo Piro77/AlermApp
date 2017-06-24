@@ -35,6 +35,8 @@ public class SamplePeriodicService extends BasePeriodicService
     // 画面から常駐を解除したい場合のために，常駐インスタンスを保持
     public static BasePeriodicService activeService;
 
+    private static int errcnt = 9;
+
 
     @Override
     protected long getIntervalMS() {
@@ -69,11 +71,23 @@ public class SamplePeriodicService extends BasePeriodicService
             @Override
             public void onFailure(Call call, IOException e) {
                 //失敗しても特に何もしない。
-                Log.d(TAG,"fail "+e.getMessage());
+                errcnt++;
+                Log.d(TAG,"fail "+errcnt+" "+e.getMessage());
+                makeNextPlan();
+
+                if (errcnt > 0 && errcnt % 10 == 0) {
+                    OkHttpSingleton.getInstance().rebuildOkHttpClient();
+                    Log.d(TAG,"rebuild client");
+                    SamplePeriodicService.stopResidentIfActive(getApplicationContext());
+                    new SamplePeriodicService().startResident(getApplicationContext());
+                }
+
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                makeNextPlan();
+                errcnt=0;
                 if (response.isSuccessful()) {
                     Log.d(TAG,"Success");
                     String body = response.body().string();
@@ -108,12 +122,6 @@ public class SamplePeriodicService extends BasePeriodicService
 
             }
         });
-
-        // ログ出力（ここに定期実行したい処理を書く）
-//       Log.d(TAG, "fuga");
-
-        // 次回の実行について計画を立てる
-        makeNextPlan();
     }
 
 
