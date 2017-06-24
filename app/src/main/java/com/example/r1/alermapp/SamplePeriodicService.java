@@ -35,7 +35,7 @@ public class SamplePeriodicService extends BasePeriodicService
     // 画面から常駐を解除したい場合のために，常駐インスタンスを保持
     public static BasePeriodicService activeService;
 
-    private static int errcnt = 9;
+    private static int errcnt = 0;
 
 
     @Override
