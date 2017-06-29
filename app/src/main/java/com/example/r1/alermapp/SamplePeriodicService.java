@@ -46,7 +46,7 @@ public class SamplePeriodicService extends BasePeriodicService
         int mm = calendar.get(Calendar.MINUTE);
         Log.d(TAG,"Hour "+String.valueOf(hh)+" Min "+String.valueOf(mm));
         if ((hh > 21) || (hh < 9)) {
-            return 1000 * 1800;
+            return 1000 * 120;
         }
         return 1000 * 120;
     }
@@ -78,8 +78,7 @@ public class SamplePeriodicService extends BasePeriodicService
                 if (errcnt > 0 && errcnt % 10 == 0) {
                     OkHttpSingleton.getInstance().rebuildOkHttpClient();
                     Log.d(TAG,"rebuild client");
-                    SamplePeriodicService.stopResidentIfActive(getApplicationContext());
-                    new SamplePeriodicService().startResident(getApplicationContext());
+                    RestartIntentService.startActionFoo(getApplicationContext());
                 }
 
             }

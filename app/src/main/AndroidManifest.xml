@@ -31,9 +31,13 @@
         <!-- サンプルのサービス -->
         <service android:name=".SamplePeriodicService" />
 
-        <activity android:name=".AlarmActivity"
-            android:showOnLockScreen="true"
-            ></activity>
+        <activity
+            android:name=".AlarmActivity"
+            android:showOnLockScreen="true" />
+
+        <service
+            android:name=".RestartIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
