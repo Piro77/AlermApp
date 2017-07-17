@@ -62,7 +62,7 @@ public class SamplePeriodicService extends BasePeriodicService
         OkHttpClient client = OkHttpSingleton.getInstance().getOkHttpClient();
 
         final Request request = new Request.Builder()
-                .url("http://192.168.1.23/check.html")
+                .url("192.168.1.23/check.html?"+System.currentTimeMillis())
                 .cacheControl(new CacheControl.Builder().noCache().build())
                 .build();
 
@@ -77,7 +77,7 @@ public class SamplePeriodicService extends BasePeriodicService
 
                 if (errcnt > 0 && errcnt % 10 == 0) {
                     OkHttpSingleton.getInstance().rebuildOkHttpClient();
-                    Log.d(TAG,"rebuild client");
+                    Log.d(TAG,"restart service ");
                     RestartIntentService.startActionFoo(getApplicationContext());
                 }
 
