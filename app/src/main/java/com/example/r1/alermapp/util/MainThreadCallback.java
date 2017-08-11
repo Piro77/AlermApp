@@ -7,14 +7,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-
+/*
 import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * Created by r1 on 2017/06/03.
- */
+
 public abstract class MainThreadCallback implements Callback {
     private static final String TAG = MainThreadCallback.class.getSimpleName();
 
@@ -61,3 +59,4 @@ public abstract class MainThreadCallback implements Callback {
         new Handler(Looper.getMainLooper()).post(task);
     }
 }
+*/

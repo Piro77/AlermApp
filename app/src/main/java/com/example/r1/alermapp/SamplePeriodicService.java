@@ -1,4 +1,5 @@
 package com.example.r1.alermapp;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,17 +13,14 @@ import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Calendar;
 
-import okhttp3.CacheControl;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * 常駐型サービスのサンプル。定期的にログ出力する。
@@ -56,13 +54,39 @@ public class SamplePeriodicService extends BasePeriodicService
     protected void execTask() {
         activeService = this;
 
+        Ion.with(getApplicationContext())
+                .load("http://192.168.1.23/api/chk/check.html?"+System.currentTimeMillis())
+                .asString()
+                .setCallback(new FutureCallback<String>() {
+                    @Override
+                    public void onCompleted(Exception e, String result) {
+                        if (e != null) {
+                            errcnt++;
+                            Log.d(TAG,"fail "+errcnt+" "+e.toString());
+                        }
+                        else {
+                            errcnt=0;
+                            Log.d(TAG, "result: " + result);
+                            if (result.contains("NG")) {
+                                //応答にNGがあった場合なにかする。
+                                Log.d(TAG,"NG Detect");
+                                setNotification();
+                            }
+                        }
+                        makeNextPlan();
+                    }
+                });
+
+
 
         // ※もし毎回の処理が重い場合は，メインスレッドを妨害しないために
         // ここから下を別スレッドで実行する。
+        /*
+
         OkHttpClient client = OkHttpSingleton.getInstance().getOkHttpClient();
 
         final Request request = new Request.Builder()
-                .url("192.168.1.23/check.html?"+System.currentTimeMillis())
+                .url("http://dtivps.srzp.net/api/chk/check.html?"+System.currentTimeMillis())
                 .cacheControl(new CacheControl.Builder().noCache().build())
                 .build();
 
@@ -76,9 +100,10 @@ public class SamplePeriodicService extends BasePeriodicService
                 makeNextPlan();
 
                 if (errcnt > 0 && errcnt % 10 == 0) {
-                    OkHttpSingleton.getInstance().rebuildOkHttpClient();
-                    Log.d(TAG,"restart service ");
-                    RestartIntentService.startActionFoo(getApplicationContext());
+                    Log.d(TAG,"exit service ");
+
+                    delaystart();
+                    android.os.Process.killProcess(android.os.Process.myPid());
                 }
 
             }
@@ -101,11 +126,7 @@ public class SamplePeriodicService extends BasePeriodicService
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                /*
-                                Intent i = new Intent(getApplicationContext(),AlarmActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(i);
-                                */
+
                                 Intent intent = new Intent(getApplicationContext(), AlarmActivity.class);
                                 PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0, intent, 0);
                                 try {
@@ -121,6 +142,7 @@ public class SamplePeriodicService extends BasePeriodicService
 
             }
         });
+        */
     }
 
 
@@ -177,5 +199,17 @@ public class SamplePeriodicService extends BasePeriodicService
     }
     private void runOnUiThread(Runnable task) {
         new Handler(Looper.getMainLooper()).post(task);
+    }
+
+    private void delaystart() {
+        long ct = System.currentTimeMillis(); //get current time
+        Intent restartService = new Intent(getApplicationContext(),
+                OnBootReceiver.class);
+        PendingIntent restartServicePI = PendingIntent.getService(
+                getApplicationContext(), 0, restartService,
+                0);
+
+        AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        mgr.setRepeating(AlarmManager.RTC_WAKEUP, ct, 1 * 1000, restartServicePI);
     }
 }
