@@ -62,7 +62,19 @@ public class SamplePeriodicService extends BasePeriodicService
                     public void onCompleted(Exception e, String result) {
                         if (e != null) {
                             errcnt++;
-                            Log.d(TAG,"fail "+errcnt+" "+e.toString());
+                            String emsg = e.getMessage();
+                            if (emsg == null) {
+                                emsg = e.toString();
+                            }
+                            Log.d(TAG,"fail "+errcnt+" "+emsg);
+                            
+                            if (errcnt > 0 && errcnt % 10 == 0) {
+                                Log.d(TAG,"exit service ");
+
+                                delaystart();
+                                android.os.Process.killProcess(android.os.Process.myPid());
+                            }
+
                         }
                         else {
                             errcnt=0;
