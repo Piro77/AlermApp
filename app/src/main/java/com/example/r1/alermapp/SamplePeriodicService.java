@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.koushikdutta.async.future.FutureCallback;
@@ -67,7 +68,7 @@ public class SamplePeriodicService extends BasePeriodicService
                                 emsg = e.toString();
                             }
                             Log.d(TAG,"fail "+errcnt+" "+emsg);
-                            
+                            sendBroadcastMessage(emsg);
                             if (errcnt > 0 && errcnt % 10 == 0) {
                                 Log.d(TAG,"exit service ");
 
@@ -85,6 +86,7 @@ public class SamplePeriodicService extends BasePeriodicService
                                 setNotification();
                             }
                         }
+
                         makeNextPlan();
                     }
                 });
@@ -223,5 +225,13 @@ public class SamplePeriodicService extends BasePeriodicService
 
         AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         mgr.setRepeating(AlarmManager.RTC_WAKEUP, ct, 1 * 1000, restartServicePI);
+    }
+    private void sendBroadcastMessage(String msg) {
+        Intent i = new Intent();
+        i.setAction("action2");
+        i.putExtra("msg",msg);
+
+
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
     }
 }

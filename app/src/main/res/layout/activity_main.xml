@@ -8,20 +8,10 @@
     tools:context="com.example.r1.alermapp.MainActivity">
 
 
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name" />
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="TextView" />
 
     <Button
@@ -35,7 +25,6 @@
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="TextView" />
 
     <Button
@@ -44,4 +33,19 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="stopalarm" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ログ" />
+
+
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:minHeight="250dp">
+    </ListView>
+
 </LinearLayout>
