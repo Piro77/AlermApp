@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private static Toast toast;
     private ListView mListview;
     ArrayAdapter<String> mArrayAdapter;
-    private static final String[] foods = {"テスト","リンゴ","バナナ","2","3","4","5"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         mArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
         mListview.setAdapter(mArrayAdapter);
-        mArrayAdapter.add("1");
-        mArrayAdapter.add("2");
-
-        String m = mArrayAdapter.getItem(0);
-        Log.d(TAG,m);
-        mArrayAdapter.remove(m);
-        mArrayAdapter.notifyDataSetChanged();
 
         IntentFilter filter = new IntentFilter();
         filter.addAction("action2");
@@ -91,7 +83,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("", "receive : " + intent.getStringExtra("msg"));
-            mArrayAdapter.add(intent.getStringExtra("msg"));
+            int cnt;
+            String oldmsg;
+            cnt = mArrayAdapter.getCount();
+            if (cnt > 100) {
+                oldmsg=mArrayAdapter.getItem(cnt-1);
+                mArrayAdapter.remove(oldmsg);
+            }
+            mArrayAdapter.insert(intent.getStringExtra("msg"),0);
             mArrayAdapter.notifyDataSetChanged();
         }
     };

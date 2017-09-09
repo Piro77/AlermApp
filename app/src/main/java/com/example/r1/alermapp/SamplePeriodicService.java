@@ -20,7 +20,10 @@ import com.koushikdutta.ion.Ion;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 
 /**
@@ -80,6 +83,7 @@ public class SamplePeriodicService extends BasePeriodicService
                         else {
                             errcnt=0;
                             Log.d(TAG, "result: " + result);
+                            sendBroadcastMessage(result);
                             if (result.contains("NG")) {
                                 //応答にNGがあった場合なにかする。
                                 Log.d(TAG,"NG Detect");
@@ -228,8 +232,12 @@ public class SamplePeriodicService extends BasePeriodicService
     }
     private void sendBroadcastMessage(String msg) {
         Intent i = new Intent();
+
+        final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss ");
+        final Date date = new Date(System.currentTimeMillis());
+         df.format(date);
         i.setAction("action2");
-        i.putExtra("msg",msg);
+        i.putExtra("msg",df.format(date)+msg);
 
 
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
