@@ -20,6 +20,7 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
+    private final static String SAVEARRAYITEM = "savearrayitem";
     private static Toast toast;
     private ListView mListview;
     ArrayAdapter<String> mArrayAdapter;
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             int cnt;
             String oldmsg;
             cnt = mArrayAdapter.getCount();
-            if (cnt > 100) {
+            if (cnt > 30) {
                 oldmsg=mArrayAdapter.getItem(cnt-1);
                 mArrayAdapter.remove(oldmsg);
             }
@@ -100,5 +101,30 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        int cnt = mArrayAdapter.getCount();
+        StringBuilder sb = new StringBuilder();
+
+        for(int i=0;i<cnt;i++) {
+            sb.append(mArrayAdapter.getItem(i)).append(",");
+        }
+        outState.putString(SAVEARRAYITEM,sb.toString());
+        Log.d(TAG,"saved "+cnt+" item");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        String s = savedInstanceState.getString(SAVEARRAYITEM);
+        String[] itemlist = s.split(",");
+        for (String val:itemlist) {
+            mArrayAdapter.add(val);
+        }
+        mArrayAdapter.notifyDataSetChanged();
+        Log.d(TAG,"restore item");
     }
 }
