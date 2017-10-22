@@ -14,6 +14,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.example.r1.alermapp.util.Settings;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -59,7 +61,7 @@ public class SamplePeriodicService extends BasePeriodicService
         activeService = this;
 
         Ion.with(getApplicationContext())
-                .load("http://192.168.1.23/api/chk/check.html?"+System.currentTimeMillis())
+                .load("http://192.168.1.19/api/chk/check.html?"+System.currentTimeMillis())
                 .asString()
                 .setCallback(new FutureCallback<String>() {
                     @Override
@@ -74,9 +76,11 @@ public class SamplePeriodicService extends BasePeriodicService
                             sendBroadcastMessage(emsg);
                             if (errcnt > 0 && errcnt % 10 == 0) {
                                 Log.d(TAG,"exit service ");
-
+                                /*
                                 delaystart();
                                 android.os.Process.killProcess(android.os.Process.myPid());
+                                */
+                                startMainAndQuit();
                             }
 
                         }
@@ -88,6 +92,11 @@ public class SamplePeriodicService extends BasePeriodicService
                                 //応答にNGがあった場合なにかする。
                                 Log.d(TAG,"NG Detect");
                                 setNotification();
+                            }
+                            if (result.contains("TASK")) {
+                                Log.d(TAG,"TASK Detect");
+                                startMainAndQuit();
+
                             }
                         }
 
@@ -104,7 +113,7 @@ public class SamplePeriodicService extends BasePeriodicService
         OkHttpClient client = OkHttpSingleton.getInstance().getOkHttpClient();
 
         final Request request = new Request.Builder()
-                .url("http://dtivps.srzp.net/api/chk/check.html?"+System.currentTimeMillis())
+                .url("http://192.168.1.19/api/chk/check.html?"+System.currentTimeMillis())
                 .cacheControl(new CacheControl.Builder().noCache().build())
                 .build();
 
@@ -194,6 +203,13 @@ public class SamplePeriodicService extends BasePeriodicService
         super.onDestroy();
     }
 
+    private void startMainAndQuit() {
+        //アクテビティを起動
+        Intent userintent = new Intent(getApplicationContext(), MainActivity.class);
+        userintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        userintent.putExtra("STARTFLG","STARTQUIT");
+        getApplication().startActivity(userintent);
+    }
     private void setNotification() {
         PendingIntent contentIntent = PendingIntent.getActivity(
                 this, 0,
@@ -241,5 +257,21 @@ public class SamplePeriodicService extends BasePeriodicService
 
 
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+        savePref(df.format(date)+msg);
+    }
+
+    private void savePref(String msg) {
+        try {
+            ArrayList<String> l = Settings.loadList(getApplicationContext(),"APPLOG");
+            if (l.size()>30) {
+                l.remove(29);
+            }
+            l.add(0,msg);
+            Settings.saveList(getApplicationContext(),"APPLOG",l);
+            Log.d(TAG,"listcount "+l.size());
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
 }
