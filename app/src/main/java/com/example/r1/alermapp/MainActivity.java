@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.r1.alermapp.util.Settings;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,10 +29,26 @@ public class MainActivity extends AppCompatActivity {
     private ListView mListview;
     ArrayAdapter<String> mArrayAdapter;
 
+    //画面終了用関数
+    private final Runnable finishfunc = new Runnable() {
+        @Override
+        public void run() {
+            moveTaskToBack(true);
+            Log.d(TAG,"finishfunc called");
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent intent = getIntent();
+        String value = intent.getStringExtra("STARTFLG");//設定したkeyで取り出す
+        if (value != null && value.equals("STARTQUIT")) {
+            Log.d(TAG,"force finish");
+            new Handler().postDelayed(finishfunc,1000);
+        }
 
 
         if (SamplePeriodicService.isServiceRunning()) {
@@ -62,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
 
         mArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
         mListview.setAdapter(mArrayAdapter);
+
+        ArrayList<String> l = Settings.loadList(getApplicationContext(),"APPLOG");
+        mArrayAdapter.addAll(l);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction("action2");
