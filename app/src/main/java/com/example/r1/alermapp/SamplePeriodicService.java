@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +15,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.example.r1.alermapp.util.NotificationSoundManager;
+import com.example.r1.alermapp.util.SampleConst;
 import com.example.r1.alermapp.util.Settings;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -41,7 +44,7 @@ public class SamplePeriodicService extends BasePeriodicService
 
     private static int errcnt = 0;
 
-
+    private NotificationSoundManager mNSM=null;
     @Override
     protected long getIntervalMS() {
         //10時から9時までは5分おきその他は一時間
@@ -61,7 +64,7 @@ public class SamplePeriodicService extends BasePeriodicService
         activeService = this;
 
         Ion.with(getApplicationContext())
-                .load("http://192.168.1.19/api/chk/check.html?"+System.currentTimeMillis())
+                .load(SampleConst.APIURL+System.currentTimeMillis())
                 .asString()
                 .setCallback(new FutureCallback<String>() {
                     @Override
@@ -215,14 +218,19 @@ public class SamplePeriodicService extends BasePeriodicService
                 this, 0,
                 new Intent(this, MainActivity.class), 0);
 
+        if (mNSM == null) {
+            mNSM = new NotificationSoundManager(getApplicationContext(),false);
+        }
+        Uri soundUri = mNSM.getUri(Settings.loadInt(getApplicationContext(),"SOUNDNO"));
+
         Notification notif= new Notification.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("テスト通知")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 //.setContentIntent(contentIntent)
-                .setDefaults(Notification.DEFAULT_SOUND
-                        | Notification.DEFAULT_VIBRATE
+                .setDefaults(Notification.DEFAULT_VIBRATE
                         | Notification.DEFAULT_LIGHTS)
+                .setSound(soundUri)
                 .setAutoCancel(true)
                 .build();
 

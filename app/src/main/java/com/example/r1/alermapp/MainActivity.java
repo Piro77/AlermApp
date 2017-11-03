@@ -6,16 +6,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.r1.alermapp.util.NotificationSoundManager;
 import com.example.r1.alermapp.util.Settings;
 
 import java.util.ArrayList;
@@ -27,7 +33,11 @@ public class MainActivity extends AppCompatActivity {
     private final static String SAVEARRAYITEM = "savearrayitem";
     private static Toast toast;
     private ListView mListview;
+    private Spinner mSpinner;
     ArrayAdapter<String> mArrayAdapter;
+    ArrayAdapter<String> mArrayAdapterSpinner;
+    private NotificationSoundManager mNotificationSoundManager;
+    private Boolean mSpinnerReadyFlg = false;
 
     //画面終了用関数
     private final Runnable finishfunc = new Runnable() {
@@ -77,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
                 SamplePeriodicService.stopResidentIfActive(getApplicationContext());
             }
         });
-        mListview = (ListView)findViewById(R.id.listview);
 
+        mListview = (ListView) findViewById(R.id.listview);
 
         mArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
         mListview.setAdapter(mArrayAdapter);
@@ -86,11 +96,37 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> l = Settings.loadList(getApplicationContext(),"APPLOG");
         mArrayAdapter.addAll(l);
 
+        mNotificationSoundManager = new NotificationSoundManager(getApplicationContext());
+
+        mSpinner = (Spinner)findViewById(R.id.spinner);
+
+        mArrayAdapterSpinner = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,mNotificationSoundManager.getNameList());
+        mArrayAdapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(mArrayAdapterSpinner);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (mSpinnerReadyFlg) {
+                    mNotificationSoundManager.play(i);
+                    Settings.saveInt(getApplicationContext(),"SOUNDNO",i);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         IntentFilter filter = new IntentFilter();
         filter.addAction("action2");
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver,filter);
 
+
+        mSpinner.setSelection(Settings.loadInt(getApplicationContext(),"SOUNDNO"),false);
+        mSpinnerReadyFlg=true;
     }
 
 
@@ -116,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
             }
             mArrayAdapter.insert(intent.getStringExtra("msg"),0);
             mArrayAdapter.notifyDataSetChanged();
+
+            mNotificationSoundManager = new NotificationSoundManager(getApplicationContext());
         }
     };
 
