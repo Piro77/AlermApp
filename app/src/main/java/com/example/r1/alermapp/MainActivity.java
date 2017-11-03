@@ -26,6 +26,7 @@ import com.example.r1.alermapp.util.Settings;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.RunnableFuture;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,6 +46,14 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             moveTaskToBack(true);
             Log.d(TAG,"finishfunc called");
+        }
+    };
+
+    private final Runnable spinnersoundenabler = new Runnable() {
+        @Override
+        public void run() {
+            mSpinnerReadyFlg=true;
+            Log.d(TAG,"spinner select sound enabled");
         }
     };
 
@@ -126,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mSpinner.setSelection(Settings.loadInt(getApplicationContext(),"SOUNDNO"),false);
-        mSpinnerReadyFlg=true;
+
     }
 
 
@@ -154,6 +163,8 @@ public class MainActivity extends AppCompatActivity {
             mArrayAdapter.notifyDataSetChanged();
 
             mNotificationSoundManager = new NotificationSoundManager(getApplicationContext());
+            //spinner選択後に音が鳴る処理を5秒後に有効にする
+            new Handler().postDelayed(spinnersoundenabler,5000);
         }
     };
 
@@ -188,4 +199,5 @@ public class MainActivity extends AppCompatActivity {
         mArrayAdapter.notifyDataSetChanged();
         Log.d(TAG,"restore item");
     }
+
 }
