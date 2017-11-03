@@ -1,14 +1,9 @@
 package com.example.r1.alermapp;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -25,8 +20,6 @@ import com.example.r1.alermapp.util.NotificationSoundManager;
 import com.example.r1.alermapp.util.Settings;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.concurrent.RunnableFuture;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -131,6 +124,10 @@ public class MainActivity extends AppCompatActivity {
 
         mSpinner.setSelection(Settings.loadInt(getApplicationContext(),"SOUNDNO"),false);
 
+        mNotificationSoundManager = new NotificationSoundManager(getApplicationContext());
+        //spinner選択後に音が鳴る処理を5秒後に有効にする
+        new Handler().postDelayed(spinnersoundenabler,5000);
+
     }
 
 
@@ -143,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("", "receive : " + intent.getStringExtra("msg"));
@@ -156,16 +153,12 @@ public class MainActivity extends AppCompatActivity {
             }
             mArrayAdapter.insert(intent.getStringExtra("msg"),0);
             mArrayAdapter.notifyDataSetChanged();
-
-            mNotificationSoundManager = new NotificationSoundManager(getApplicationContext());
-            //spinner選択後に音が鳴る処理を5秒後に有効にする
-            new Handler().postDelayed(spinnersoundenabler,5000);
         }
     };
 
     @Override
     protected void onDestroy() {
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mReceiver);
 
         super.onDestroy();
     }
@@ -179,15 +172,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        ArrayList<String> l = Settings.loadList(getApplicationContext(),"APPLOG");
-        mArrayAdapter.clear();
-        mArrayAdapter.addAll(l);
+
+        Log.d(TAG,"restore");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mReceiver);
+        Log.d(TAG,"unregist mReceiver");
     }
 
     @Override
@@ -196,7 +189,13 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction("action2");
 
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver,filter);
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mReceiver,filter);
+
+        Log.d(TAG,"  regist mReceiver");
+        ArrayList<String> l = Settings.loadList(getApplicationContext(),"APPLOG");
+        mArrayAdapter.clear();
+        mArrayAdapter.addAll(l);
+        mArrayAdapter.notifyDataSetChanged();
 
     }
 }
