@@ -13,8 +13,8 @@ import com.example.r1.alermapp.R;
  */
 
 public class NotificationSoundManager {
-    private int[] mSoundList = {R.raw.arpeggio,R.raw.youhavenewmessage,R.raw.mizukimail};
-    private String[] mSoundNameList ={"サウンド１","サウンド２","音声１"};
+    private int[] mSoundList = {R.raw.arpeggio,R.raw.youhavenewmessage,R.raw.youvebeeninformed,R.raw.mizukimail};
+    private String[] mSoundNameList ={"サウンド１","サウンド２","サウンド３","音声１"};
 
     private SoundPool mSoundPool;
     private int[] mSoundid;
