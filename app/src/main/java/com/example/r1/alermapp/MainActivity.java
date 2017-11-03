@@ -128,11 +128,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("action2");
-
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver,filter);
-
 
         mSpinner.setSelection(Settings.loadInt(getApplicationContext(),"SOUNDNO"),false);
 
@@ -178,26 +173,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        int cnt = mArrayAdapter.getCount();
-        StringBuilder sb = new StringBuilder();
 
-        for(int i=0;i<cnt;i++) {
-            sb.append(mArrayAdapter.getItem(i)).append(",");
-        }
-        outState.putString(SAVEARRAYITEM,sb.toString());
-        Log.d(TAG,"saved "+cnt+" item");
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        String s = savedInstanceState.getString(SAVEARRAYITEM);
-        String[] itemlist = s.split(",");
-        for (String val:itemlist) {
-            mArrayAdapter.add(val);
-        }
-        mArrayAdapter.notifyDataSetChanged();
-        Log.d(TAG,"restore item");
+        ArrayList<String> l = Settings.loadList(getApplicationContext(),"APPLOG");
+        mArrayAdapter.clear();
+        mArrayAdapter.addAll(l);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("action2");
+
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver,filter);
+
+    }
 }
