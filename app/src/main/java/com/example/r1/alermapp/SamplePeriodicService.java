@@ -113,7 +113,7 @@ public class SamplePeriodicService extends BasePeriodicService
         OkHttpClient client = OkHttpSingleton.getInstance().getOkHttpClient();
 
         final Request request = new Request.Builder()
-                .url("http://192.168.1.19/api/chk/check.html?"+System.currentTimeMillis())
+                .url("http://dtivps.srzp.net/api/chk/check.html?"+System.currentTimeMillis())
                 .cacheControl(new CacheControl.Builder().noCache().build())
                 .build();
 
@@ -264,11 +264,11 @@ public class SamplePeriodicService extends BasePeriodicService
         try {
             ArrayList<String> l = Settings.loadList(getApplicationContext(),"APPLOG");
             if (l.size()>30) {
-                l.remove(29);
+                l.remove(l.size()-1);
             }
             l.add(0,msg);
             Settings.saveList(getApplicationContext(),"APPLOG",l);
-            Log.d(TAG,"listcount "+l.size());
+            //Log.d(TAG,"listcount "+l.size());
         }catch(Exception ex) {
             ex.printStackTrace();
         }
