@@ -63,11 +63,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        if (SamplePeriodicService.isServiceRunning()) {
+        if (HttpGetService.isServiceRunning()) {
             findViewById(R.id.button4).setEnabled(false);
         }
         else {
-            new SamplePeriodicService().startResident(getApplicationContext());
+            Intent i = new Intent(getApplicationContext(), HttpGetService.class);
+            startService(i);
             findViewById(R.id.button4).setEnabled(false);
         }
         findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
@@ -76,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
                 // クリック時の処理
                 showToast("btn1");
                 Log.d(TAG,"click1");
-                new SamplePeriodicService().startResident(getApplicationContext());
+                Intent i = new Intent(getApplicationContext(), HttpGetService.class);
+                startService(i);
                 v.setEnabled(false);
 
             }
@@ -86,7 +88,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 showToast("btn2");
                 Log.d(TAG,"btn2");
-                SamplePeriodicService.stopResidentIfActive(getApplicationContext());
+                Intent i = new Intent(getApplicationContext(), HttpGetService.class);
+                stopService(i);
+                startService(i);
             }
         });
 
