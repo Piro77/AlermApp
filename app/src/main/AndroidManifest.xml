@@ -20,13 +20,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".OnBootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <!-- サンプルのサービス
+        <!--
+        サンプルのサービス
         <service android:name=".SamplePeriodicService" />
 
         <activity
@@ -40,7 +35,17 @@
         <service
             android:name=".HttpGetService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <receiver
+            android:name=".OnBootRecevier2"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+        </receiver>
     </application>
 
 </manifest>
