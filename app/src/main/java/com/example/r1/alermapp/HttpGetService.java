@@ -28,12 +28,21 @@ import java.util.TimerTask;
 public class HttpGetService extends Service {
 
     public static HttpGetService acriveService;
+    public static int mInterval=30000;
     private int errcnt=0;
     private  static final String TAG = HttpGetService.class.getSimpleName();
     private NotificationSoundManager mNSM=null;
 
     private Timer mTimer = null;
-    Handler mHandler = new Handler();
+    private Handler mHandler = new Handler();
+
+    private Runnable mRunTask = new Runnable() {
+        @Override
+        public void run() {
+            execTask();
+            mHandler.postDelayed(mRunTask,mInterval);
+        }
+    };
 
     public HttpGetService() {
 
@@ -48,18 +57,8 @@ public class HttpGetService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        // タイマーの設定 1秒毎にループ
-        mTimer = new Timer(true);
-        mTimer.schedule( new TimerTask(){
-            @Override
-            public void run(){
-                mHandler.post( new Runnable(){
-                    public void run(){
-                        execTask();
-                    }
-                });
-            }
-        }, 30000, 30000);
+
+        mHandler.post(mRunTask);
 
         acriveService = this;
         return START_STICKY;
@@ -179,16 +178,25 @@ public class HttpGetService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // タイマー停止
-        if( mTimer != null ){
-            mTimer.cancel();
-            mTimer = null;
-        }
+        mHandler.removeCallbacks(mRunTask);
         acriveService=null;
     }
     public static boolean isServiceRunning() {
         if (acriveService==null) return false;
         return true;
+    }
+    public static void updateInterval(int interval) {
+        if (interval<5000) {
+            interval = 5000;
+        }
+        if (interval > 120000) {
+            interval=120000;
+        }
+        if (mInterval!=interval) {
+            Log.d(TAG,"updateInterval "+mInterval+" TO "+interval);
+            mInterval=interval;
+        }
+        return;
     }
 }
 
