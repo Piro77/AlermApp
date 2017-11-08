@@ -29,6 +29,7 @@ public class HttpGetService extends Service {
 
     public static HttpGetService acriveService;
     public static int mInterval=30000;
+
     private int errcnt=0;
     private  static final String TAG = HttpGetService.class.getSimpleName();
     private NotificationSoundManager mNSM=null;
@@ -197,6 +198,9 @@ public class HttpGetService extends Service {
             mInterval=interval;
         }
         return;
+    }
+    public static void updateWifiState(int state) {
+        Log.d(TAG,"WifiChanged "+state);
     }
 }
 
