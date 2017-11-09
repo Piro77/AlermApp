@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,12 +19,19 @@ import com.example.r1.alermapp.util.Settings;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class HttpGetService extends Service {
 
@@ -34,8 +42,8 @@ public class HttpGetService extends Service {
     private  static final String TAG = HttpGetService.class.getSimpleName();
     private NotificationSoundManager mNSM=null;
 
-    private Timer mTimer = null;
-    private Handler mHandler = new Handler();
+    private Handler mHandler;
+    private HandlerThread mHandlerThread;
 
     private Runnable mRunTask = new Runnable() {
         @Override
@@ -59,6 +67,9 @@ public class HttpGetService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
+        mHandlerThread = new HandlerThread("other");
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
         mHandler.post(mRunTask);
 
         acriveService = this;
@@ -66,6 +77,8 @@ public class HttpGetService extends Service {
     }
 
     private void execTask() {
+
+        okhttp3sample();
 
         if (mNSM==null){
             mNSM = new NotificationSoundManager(getApplicationContext(),true);
@@ -180,7 +193,9 @@ public class HttpGetService extends Service {
     public void onDestroy() {
         super.onDestroy();
         mHandler.removeCallbacks(mRunTask);
+        mHandlerThread.quit();
         acriveService=null;
+        Log.d(TAG,"ondestroy");
     }
     public static boolean isServiceRunning() {
         if (acriveService==null) return false;
@@ -201,6 +216,28 @@ public class HttpGetService extends Service {
     }
     public static void updateWifiState(int state) {
         Log.d(TAG,"WifiChanged "+state);
+    }
+
+    private void okhttp3sample() {
+        final Request request = new Request.Builder()
+                // URLを生成
+                .url(SampleConst.APIURL)
+                .get()
+                .build();
+        // クライアントオブジェクトを作成する
+        final OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            ResponseBody body = response.body();
+            Log.d(TAG,"body "+body.string());
+            response.close();
+        }catch(IOException ex) {
+            ex.printStackTrace();
+        }
+
+        // 新しいリクエストを行う
+
     }
 }
 
