@@ -6,5 +6,7 @@ package com.example.r1.alermapp.util;
 
 public class SampleConst {
     public static final String APIURL = "http://192.168.1.19/api/chk/check.html?";
+    public static final String LOGMSGINTENT = "action2";
+    public static final String WIFISTATEINTENT = "wifistatechanged";
 
 }
