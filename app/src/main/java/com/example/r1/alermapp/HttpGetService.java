@@ -4,12 +4,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.support.annotation.IntDef;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -24,8 +26,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -41,6 +41,8 @@ public class HttpGetService extends Service {
     private int errcnt=0;
     private  static final String TAG = HttpGetService.class.getSimpleName();
     private NotificationSoundManager mNSM=null;
+
+    private int mForceSettingUpdate = 0;
 
     private Handler mHandler;
     private HandlerThread mHandlerThread;
@@ -72,13 +74,20 @@ public class HttpGetService extends Service {
         mHandler = new Handler(mHandlerThread.getLooper());
         mHandler.post(mRunTask);
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SampleConst.WIFISTATEINTENT);
+
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mWifiReceiver,filter);
+
         acriveService = this;
         return START_STICKY;
     }
 
     private void execTask() {
 
-        okhttp3sample();
+        if (mForceSettingUpdate==1) {
+            okhttp3sample();
+        }
 
         if (mNSM==null){
             mNSM = new NotificationSoundManager(getApplicationContext(),true);
@@ -166,7 +175,7 @@ public class HttpGetService extends Service {
         final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss ");
         final Date date = new Date(System.currentTimeMillis());
         df.format(date);
-        i.setAction("action2");
+        i.setAction(SampleConst.LOGMSGINTENT);
         i.putExtra("msg",df.format(date)+msg);
 
 
@@ -195,6 +204,7 @@ public class HttpGetService extends Service {
         mHandler.removeCallbacks(mRunTask);
         mHandlerThread.quit();
         acriveService=null;
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mWifiReceiver);
         Log.d(TAG,"ondestroy");
     }
     public static boolean isServiceRunning() {
@@ -230,7 +240,11 @@ public class HttpGetService extends Service {
         try {
             Response response = call.execute();
             ResponseBody body = response.body();
-            Log.d(TAG,"body "+body.string());
+            String b = body.string();
+            Log.d(TAG,"body "+b);
+            if (b.indexOf("OK")>=0) {
+                if (mForceSettingUpdate ==1) mForceSettingUpdate = 0;
+            }
             response.close();
         }catch(IOException ex) {
             ex.printStackTrace();
@@ -239,5 +253,18 @@ public class HttpGetService extends Service {
         // 新しいリクエストを行う
 
     }
+    private BroadcastReceiver mWifiReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int status = intent.getIntExtra("status",-1);
+            //invalid
+            if (status == -1) return;
+
+            Log.d(TAG,"WifiState Changed "+status);
+            if (status == 1) {
+                mForceSettingUpdate = 1;
+            }
+        }
+    };
 }
 

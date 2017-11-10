@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.r1.alermapp.util.NotificationSoundManager;
+import com.example.r1.alermapp.util.SampleConst;
 import com.example.r1.alermapp.util.Settings;
 
 import java.util.ArrayList;
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         IntentFilter filter = new IntentFilter();
-        filter.addAction("action2");
+        filter.addAction(SampleConst.LOGMSGINTENT);
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mReceiver,filter);
 
