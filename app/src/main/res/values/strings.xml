@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AlermApp</string>
+
+    <string name="intent_logmsg_action">INTENT_LOG_MSG</string>
 </resources>
